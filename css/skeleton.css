@@ -1,0 +1,12 @@
+@charset "utf-8";
+/* CSS Document */
+
+@media all and (max-width: 640) {
+	
+#footerWrap {  font-size:10px; color:#000000; }	
+}
+
+@media all and (min-width: 641px) and (max-width: 980) {
+	
+#footerWrap {  font-size:11px;  color:#ff9000;}	
+}

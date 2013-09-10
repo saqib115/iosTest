@@ -1,0 +1,511 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+    <title></title>
+    <link href="css/style.css" rel="stylesheet" type="text/css" />
+    <script src="js/jquery-1.8.3.js" type="text/javascript"></script>
+    <script src="js/jquery-ui.js" type="text/javascript"></script>
+    <script type="text/javascript" src="js/jquery.Storage.js"></script>
+    <script type="text/javascript" src="js/json2.js"></script>
+    <script type="text/javascript" src="js/ckeditor.js"></script>
+    <!-- toggle menu -->
+    <script type="text/javascript">
+        $(function () {
+            // run the currently selected effect
+            function runEffect() {
+                // get effect type from
+                var selectedEffect = $("#effectTypes").val();
+
+                // most effect types need no options passed by default
+                var options = {};
+                // some effects have required parameters
+                if (selectedEffect === "scale") {
+                    options = { percent: 0 };
+                } else if (selectedEffect === "size") {
+                    options = { to: { width: 200, height: 60} };
+                }
+                // run the effect
+                $("#effect").toggle(selectedEffect, options, 300);
+            };
+
+            // set effect from select menu value
+            $("#button").click(function () {
+                runEffect();
+                return false;
+            });
+        });
+    </script>
+    <!-- toggle menu ends -->
+    <script type="text/javascript">
+        window.onload = function () {
+            //CKEDITOR.replace('HtmlEditorArticle');
+        };
+    </script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var online = navigator.onLine;    // Detecting the internet connection
+            if (online) {
+                // do your stuff
+            } else {
+                alert('You\'re Offline now...');
+                return false;
+            }
+            var UserName = $.Storage.get("UserName");
+
+            if ($.Storage.get("UserName") == null || $.Storage.get("UserName") == "")
+            { window.location.href = "index.html"; }
+            else if ($.Storage.get("UserName") == "guest") {
+                $('#btnSubmit').attr('disabled', 'disabled');
+            }
+            if (UserName != null) {
+                $("#loadingmessage").show();
+                var GenderId, SportName, MajorSport;
+                //Get Sports Categories
+                $.ajax(
+{
+    type: "POST",
+    url: "http://2bvision.com/Kids2proSports/createarticle.asmx/GetDropDownListSportCategory",
+    data: "{}",
+    contentType: "application/json; charset=utf-8",
+    dataType: "json",
+
+    success: function (response, status) {
+        var select = document.getElementById("DropDownListSportCategory");
+        select.options.length = 0; // clear out existing items 
+        var sportsList = response.d;
+        if (sportsList != "") {
+            $("#DropDownListSportCategory")[0].options.add(new Option("--------", "0"));
+            for (i in sportsList) {
+                MajorSport = sportsList[0].Name;
+
+                select.options[select.options.length] = new Option(sportsList[i].Name, sportsList[i].Name);
+            }
+        }
+        else {
+            $("#DropDownListSportCategory")[0].options.add(new Option("--------", "0"));
+        }
+        $("#loadingmessage").hide();
+        //SqlDataSourceSportsFromCategory(MajorSport);
+
+    },
+    failure: function (msg) {
+        alert(msg);
+    }
+}
+	);
+
+
+                // Get Sports for sport category 
+                function SqlDataSourceSportsFromCategory(MajorSport) {
+                    $("#loadingmessage").show();
+                    $.ajax(
+{
+    type: "POST",
+    url: "http://2bvision.com/Kids2proSports/createarticle.asmx/SqlDataSourceSportsFromCategory",
+    data: "{MajorSport:'" + MajorSport + "'}",
+    contentType: "application/json; charset=utf-8",
+    dataType: "json",
+
+    success: function (response, status) {
+
+        var select = document.getElementById("DropDownListSportName");
+        select.options.length = 0; // clear out existing items 
+        var sportsList = response.d;
+        if (sportsList != "") {
+            SportName = sportsList[0].Name;
+            $("#DropDownListSportName")[0].options.add(new Option("--------", "0"));
+            for (i in sportsList) {
+                select.options[select.options.length] = new Option(sportsList[i].Name, sportsList[i].Name);
+            }
+        }
+        else {
+            $("#DropDownListSportName")[0].options.add(new Option("--------", "0"));
+        }
+        $("#loadingmessage").hide();
+        //GetKeywordBySportName(SportName);	
+
+    },
+    failure: function (msg) {
+        alert(msg);
+    }
+}
+	);
+                }
+                //Get Sports from category with gender
+                function SqlDataSourceSportFromCategoryWithGender(MajorSport, Gender) {
+                    $("#loadingmessage").show();
+                    var data = { "MajorSport": MajorSport, "GenderAge": Gender };
+                    $.ajax(
+{
+
+    type: "POST",
+    url: "http://2bvision.com/Kids2proSports/createarticle.asmx/SqlDataSourceSportFromCategoryWithGender",
+
+    data: JSON.stringify(data),
+    contentType: "application/json; charset=utf-8",
+    dataType: "json",
+
+    success: function (response, status) {
+
+        var select = document.getElementById("DropDownListSportName");
+        select.options.length = 0; // clear out existing items 
+
+        var sportsList = response.d;
+        if (sportsList != "") {
+            $("#DropDownListSportName")[0].options.add(new Option("--------", "0"));
+            for (i in sportsList) {
+                select.options[select.options.length] = new Option(sportsList[i].Name, sportsList[i].Name);
+            }
+        }
+        else {
+            $("#DropDownListSportName")[0].options.add(new Option("--------", "0"));
+        }
+        $("#loadingmessage").hide();
+    },
+    failure: function (msg) {
+        alert(msg);
+    }
+}
+	);
+                }
+
+                // Load DorpDownList Keword according to selected sport Name
+                function GetKeywordBySportName(SportName) {
+                    $("#loadingmessage").show();
+                    var data = { "SportName": SportName };
+                    $.ajax(
+{
+
+    type: "POST",
+    url: "http://2bvision.com/Kids2proSports/createarticle.asmx/GetDropDownListSportName",
+
+    data: JSON.stringify(data),
+    contentType: "application/json; charset=utf-8",
+    dataType: "json",
+
+    success: function (response, status) {
+
+        var select = document.getElementById("DropDownListKeyword");
+
+        var sportsList = response.d;
+        if (sportsList != "") {
+            select.options.length = 0; // clear out existing items 	
+            $("#DropDownListKeyword")[0].options.add(new Option("--------", "0"));
+            for (i in sportsList) {
+                select.options[select.options.length] = new Option(sportsList[i].sportCategory, sportsList[i].sportCategory);
+            }
+        }
+        else {
+            $("#DropDownListKeyword")[0].options.add(new Option("--------", "0"));
+        }
+        $("#loadingmessage").hide();
+    },
+    failure: function (msg) {
+        alert(msg);
+    }
+}
+	);
+                }
+
+
+                $(function () {
+                    $("#DropDownListGenderIDe").change(function () {
+
+                        Gender = $(this).find(":selected").val();
+                        //alert(Gender);
+                        if (Gender != '0') {
+                            Gender = Gender.toString();
+                            SqlDataSourceSportFromCategoryWithGender(MajorSport, Gender);
+                        }
+                        else {
+                            SqlDataSourceSportsFromCategory(MajorSport);
+                        }
+                        //console.log("the value you selected: " + selectedValue);
+                    });
+                });
+
+                $(function () {
+                    $("#DropDownListSportCategory").change(function () {
+
+                        MajorSport = $(this).find(":selected").val();
+                        if (MajorSport != '0' && $("#DropDownListGenderIDe").val() != '0') {
+                            SqlDataSourceSportFromCategoryWithGender(MajorSport, Gender);
+                        }
+                        else if (MajorSport != '0') {
+                            SqlDataSourceSportsFromCategory(MajorSport);
+                        }
+                        //console.log("the value you selected: " + selectedValue);
+                    });
+                });
+                $(function () {
+                    $("#DropDownListSportName").change(function () {
+                        SportName = $(this).find(":selected").val();
+                        if (SportName != '0') {
+
+                            GetKeywordBySportName(SportName);
+                        }
+                        //console.log("the value you selected: " + selectedValue);
+                    });
+                });
+
+            }
+            else {
+                window.location.href = "index.html";
+            }
+        });
+
+    </script>
+    <script type="text/javascript">
+        function strip(html) {
+            var tmp = document.createElement("DIV");
+            tmp.innerHTML = html;
+            return tmp.textContent || tmp.innerText;
+        }
+    </script>
+    <script type="text/javascript">
+
+        function GetDate() {
+            var currentTime = new Date()
+            var day = currentTime.getDate() + '';
+            var month = currentTime.getMonth() + 1 + '';
+            var year = currentTime.getFullYear() + '';
+            var mins = currentTime.getMinutes() + '';
+            var sec = currentTime.getSeconds() + '';
+            var date = day + month + year + mins + sec
+            return date;
+        }
+      
+
+    </script>
+    <!--For Insteritng New Articel (Saving Article Data)-->
+    <script type="text/javascript">
+
+        function CreateArticle() {
+            var Preview;
+            Preview = $('#HtmlEditorArticle').text();
+            var article = {};
+            var asdds = $.Storage.get("UserName");
+
+            // alert(asdds);
+            var d = new Date();
+
+            var ID = $.Storage.get("UserName") + d.getDay() + d.getMonth() + d.getYear() + d.getSeconds() + d.getMilliseconds();
+            article.articleId = ID;
+            article.authorUserName = $.Storage.get("UserName");
+            article.text = $('#HtmlEditorArticle').val();
+            article.title = $('#TextBoxTitle').val();
+            article.sportCategory = $('#DropDownListSportCategory').val();
+            article.minorSport = $('#DropDownListSportName').val();
+            article.keyword = $('#DropDownListKeyword').val();
+            article.language = $('#DropDownListLanguage').val();
+            article.videoMarkup = "";
+            article.AllowComments = true;
+            article.preview = Preview;
+            article.thumbNailUrl = $('#TextBoxYouTubeLink').val();
+            article.dateTime = '';
+            if ($('#TextBoxYouTubeLink').val() != null) {
+                article.isArticleVideoYouTube = true;
+            }
+            else {
+                article.isArticleVideoYouTube = false;
+            }
+            article.groupId = '';
+            article.genderId = $('#DropDownListGenderIDe').val();
+            //article.dateTime=Date.now();     
+
+
+            if ($('#DropDownListSportCategory').val() != '0' && $('#DropDownListSportName').val() != '0' && $('#DropDownListKeyword').val() != '0' && $('#TextBoxTitle').val() != '' && $('#HtmlEditorArticle').val() != '') {
+
+                $.ajax(
+{
+    type: "POST",
+    url: "http://2bvision.com/Kids2proSports/DataAccessService.asmx/CreateArticle",
+    data: "{article:" + JSON.stringify(article) + "}",
+    contentType: "application/json; charset=utf-8",
+    dataType: "json",
+
+    success: function (response, status) {
+
+        var RedirectUrl = "ViewArticle.html?Id=" + response.d;
+        window.location.href = RedirectUrl;
+    },
+    failure: function (msg) {
+        alert(msg);
+    }
+});
+            }
+            else { alert('Please enter all required fields'); }
+
+        }
+        function GetRightAdver() {
+
+            $.ajax(
+{
+    type: "POST",
+    url: "http://2bvision.com/kids2promobile/AdvertisementManagerService.asmx/GetRightAdvertisingColumn",
+    data: "{}",
+    contentType: "application/json; charset=utf-8",
+    dataType: "json",
+
+    success: function (response, status) {
+
+        $.Storage.get("UserName");
+        var asd = $("#divRightAdds");
+        $("#divRightAdds").html(response.d);
+
+    },
+    failure: function (msg) {
+        alert(msg);
+    }
+}
+	);
+        }
+
+
+        function GetLeaderBoard() {
+
+            $.ajax(
+{
+    type: "POST",
+    url: "http://2bvision.com/kids2promobile/AdvertisementManagerService.asmx/GetLeaderBoard",
+    data: "{}",
+    contentType: "application/json; charset=utf-8",
+    dataType: "json",
+
+    success: function (response, status) {
+
+        $.Storage.get("UserName");
+        var asd = $("#divLeaderBoard");
+        $("#divLeaderBoard").html(response.d);
+
+
+    },
+    failure: function (msg) {
+        alert(msg);
+    }
+}
+	);
+        }
+    </script>
+</head>
+<body onload="GetLeaderBoard(), GetRightAdver()">
+    <div id="wraper">
+        <header>
+            <div style="background: #800000; height: 57px;">
+                <div class="newmenubar">
+                    <a class="newmenucolor" id="myaccountimage" href="MyAccount.html" title="My Account" target="_self"></a>
+                    <a class="newmenucolor" id="messageimage"  href="Messages.html" title="Messages" target="_self"></a>
+                </div>
+            </div>
+            <select name="effects" id="effectTypes" style="display: none;">
+                <option value="drop">Drop</option>
+
+            </select>
+            <a href="#" id="button"></a>
+            <div class="toggler">
+                <div id="effect" class="ui-widget-content ui-corner-all" style="display: none;">
+                    <ul id="nav">
+                        <li><a href="userprofile.html" title="User Profile" target="_self">Profile</a> </li>
+                        <li><a href="SportsDefinitions.html" target="_self" title="Sports">Sports</a> </li>
+                        <li><a href="CreateArticle.html" title="CreateArticle" target="_self">Article</a> </li>
+                        <li><a href="CreateTeam.html" title="Teams" target="_self">Teams</a></li>
+                        <li><a href="CreateFanClub.html" title="Fanclubs" target="_self">Fanclubs</a></li>
+                        <li><a href="Logout.html" title="Logout" target="_self">Log Out</a></li>
+                    </ul>
+                </div>
+            </div>
+        </header>
+        <!--<div class="innermenu">
+            <ul class="clearfix">
+                <li><a href="MyAccount.html" title="My Account" target="_self">My Account</a> </li>
+            </ul>
+        </div>-->
+        <!-- header ends -->
+        <!-- container starts-->
+         <div id="divLeaderBoard">
+        </div>
+        <div class="contetns clearfix">
+            <!-- left area starts-->
+            <div class="contentLeft fLeft">
+                <div class="innerwrapper">
+                    <!-- input -->
+                    <div class="clear">
+                        <div class="note2">
+                        <h4>
+                            <a href="ArticleSearch.html" title="#">Search for Existing Articles</a></h4>
+                        <div class="row newuser">
+                            <div id='loadingmessage' style='display: none'>
+                                <img src='images/ajax-loader.gif' />
+                                <span id="spnLoading" style="font-family: Arial, Helvetica, sans-serif; font-size: 12px;">
+                                    Searching Please Wait...</span>
+                            </div>
+                            <div id="ageRegister">
+                                <h5>
+                                    Language:</h5>
+                                <select id="DropDownListLanguage" name="DropDownListLanguage">
+                                    <option selected="true" value="English">English</option>
+                                    <option value="ja">Japanese</option>
+                                    <option value="ko">Korean</option>
+                                </select>
+                                <h5>
+                                    Sport Category (Required):</h5>
+                                <select name="DropDownListSportCategory" id="DropDownListSportCategory">
+                                    <option value="0" selected="true">--------</option>
+                                </select>
+                                <h5>
+                                    Gender / Age Identification (Optional)</h5>
+                                <select name="DropDownListGenderIDe" id="DropDownListGenderIDe">
+                                    <option selected="true" value="0">--------</option>
+                                    <option value="Boy's">Boy's</option>
+                                    <option value="Boy's High School">Boy's High School</option>
+                                    <option value="Co-Ed">Co-Ed</option>
+                                    <option value="Co-Ed High School">Co-Ed High School</option>
+                                    <option value="Girl's">Girl's</option>
+                                    <option value="Girl's High School">Girl's High School</option>
+                                    <option value="Men's">Men's</option>
+                                    <option value="Men's College">Men's College</option>
+                                    <option value="Women's">Women's</option>
+                                    <option value="Women's College">Women's College</option>
+                                    <option value="Youth">Youth</option>
+                                </select>
+                                <h5>
+                                    Sport Name (Required)</h5>
+                                <select name="DropDownListSportName" id="DropDownListSportName">
+                                    <option selected="true" value="0">--------</option>
+                                </select>
+                                <h5>
+                                    Keyword (Required)</h5>
+                                <select name="DropDownListKeyword" id="DropDownListKeyword">
+                                    <option selected="true" value="0">--------</option>
+                                </select>
+                                <div class="uploadfiles">
+                                    <h5>
+                                        Enter the Article's Title</h5>
+                                    <input type="text" name="TextBoxTitle" id="TextBoxTitle" />
+                                    <h5>
+                                        Share a YouTube Link (Optional)</h5>
+                                    <input type="text" name="TextBoxYouTubeLink" id="TextBoxYouTubeLink" value="" />
+                                </div>
+                        
+                                <br />
+                                <div style="width: 300px; height: auto;">
+                                    <!--<textarea id="ssssHtmlEditorArticle" rows="8" cols="25" name="ssssHtmlEditorArticle"></textarea>-->
+                                    <textarea id="HtmlEditorArticle" rows="8" cols="25" name="HtmlEditorArticle"></textarea>
+                                </div>
+                                <div class="uploadfiles">
+                                    <input type="button" name="btnSubmit" id="btnSubmit" value="Submit" onclick="CreateArticle()" />
+                                </div>
+                            </div>
+                        </div>
+                            </div>
+                    </div>
+                </div>
+            </div>
+            <div id="divRightAdds" class="contentRight fRight">
+                </div>
+            <!-- left area ends-->
+        </div>
+        <!-- container ends-->
+    </div>
+</body>
+</html>

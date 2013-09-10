@@ -1,0 +1,123 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title></title>
+    <link href="css/style.css" rel="stylesheet" type="text/css" />
+    <link href="css/skeleton.css" rel="stylesheet" type="text/css" />
+    <script src="js/jquery-1.8.3.js" type="text/javascript"></script>
+    <script src="js/jquery-ui.js" type="text/javascript"></script>
+    <!-- toggle menu -->
+    <script type="text/javascript">
+        $(function () {
+            // run the currently selected effect
+            function runEffect() {
+                // get effect type from
+                var selectedEffect = $("#effectTypes").val();
+
+                // most effect types need no options passed by default
+                var options = {};
+                // some effects have required parameters
+                if (selectedEffect === "scale") {
+                    options = { percent: 0 };
+                } else if (selectedEffect === "size") {
+                    options = { to: { width: 200, height: 60} };
+                }
+
+                // run the effect
+                $("#effect").toggle(selectedEffect, options, 300);
+            };
+
+            // set effect from select menu value
+            $("#button").click(function () {
+                runEffect();
+                return false;
+            });
+        });
+    </script>
+    <!-- toggle menu ends -->
+    <script language="javascript" type="text/javascript">
+
+        $(document).ready(function () {
+            var online = navigator.onLine;    // Detecting the internet connection
+            if (online) {
+                // do your stuff
+            } else {
+                alert('You\'re Offline now...');
+                return false;
+            }
+
+            $(function () {
+                $("#ddlSelectAge").change(function () {
+
+                    Gender = $(this).find(":selected").val();
+                    if (Gender == 'I am 13 year old or over') {
+                        window.location.href = "over13.html";
+                    }
+                    if (Gender == 'I am under 13 year old') {
+                        window.location.href = "under13.html";
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <div id="wraper">
+         <header style="overflow: hidden;">
+            <div style="background: #800000; height: 57px;">
+                <div class="newmenubar">
+                    <a class="newmenucolor" href="MyAccount.html" title="My Account" target="_self">My Account</a>
+                    <a  class="newmenucolor" href="#" title="Messages" target="_self">Messages</a>
+                </div>
+            </div>
+    </div>
+    <select name="effects" id="effectTypes" style="display: none;">
+        <option value="drop">Drop</option>
+
+    </select>
+    <a href="#" id="button"></a>
+    <div class="toggler">
+        <div id="effect" class="ui-widget-content ui-corner-all" style="display: none;">
+            <ul id="nav">
+                <li><a href="userprofile.html" title="User Profile" target="_self">Profile</a> </li>
+                <li><a href="SportsDefinitions.html" target="_self" title="Sports">Sports</a> </li>
+                <li><a href="CreateArticle.html" title="CreateArticle" target="_self">Article</a> </li>
+                <li><a href="CreateTeam.html" title="Teams" target="_self">Teams</a></li>
+                <li><a href="CreateFanClub.html" title="Fanclubs" target="_self">Fanclubs</a></li>
+                <li><a href="Logout.html" title="Logout" target="_self">Log Out</a></li>
+            </ul>
+        </div>
+    </div>
+    </header>
+    </div>
+    <!-- header ends -->
+    <!-- container starts-->
+    <div class="contetns">
+        <!-- login -->
+        <div class="loginWrap">
+            <div class="loginWrap">
+                <!-- tabs-->
+                <div class="loginTabs">
+                    <a href="register.html">Register</a> <a class="blue" href="index.html">Login</a>
+                </div>
+                <!-- input -->
+                <div class="clear">
+                    <div class="loginMiddle">
+                        <div class="row newuser">
+                            <b>Register for a Free Account </b>
+                            <div id="ageRegister">
+                                <select name="ddlSelectAge" id="ddlSelectAge">
+                                    <option value="0" selected="selected">--------</option>
+                                    <option value="I am 13 year old or over">I am 13 year old or over</option>
+                                    <option value="I am under 13 year old">I am under 13 year old</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- container ends-->
+    </div>
+</body>
+</html>

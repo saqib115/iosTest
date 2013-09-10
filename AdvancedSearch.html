@@ -1,0 +1,316 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <link href="css/style.css" rel="stylesheet" type="text/css" />
+    <link rel="shortcut icon" type="image/ico" href="http://www.datatables.net/media/images/favicon.ico" />
+    <script src="js/jquery-1.8.3.js" type="text/javascript"></script>
+    <script src="js/jquery-ui.js" type="text/javascript"></script>
+    <script type="text/javascript" src="js/jquery.Storage.js"></script>
+    <script type="text/javascript" src="js/jquery.jsonp-2.1.3.min.js"></script>
+    <script src="js/jquery.dataTables.min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(function () {
+            // run the currently selected effect
+            function runEffect() {
+                // get effect type from
+                var selectedEffect = $("#effectTypes").val();
+
+                // most effect types need no options passed by default
+                var options = {};
+                // some effects have required parameters
+                if (selectedEffect === "scale") {
+                    options = { percent: 0 };
+                } else if (selectedEffect === "size") {
+                    options = { to: { width: 200, height: 60} };
+                }
+
+                // run the effect
+                $("#effect").toggle(selectedEffect, options, 300);
+            };
+
+            // set effect from select menu value
+            $("#button").click(function () {
+                runEffect();
+                return false;
+            });
+        });
+    </script>
+    <script language="javascript" type="text/javascript">
+
+        $(document).ready(function () {
+var online = navigator.onLine;    // Detecting the internet connection
+         if (online) {
+             // do your stuff
+         } else {
+             alert('You\'re Offline now...');
+             return false;
+         }
+         }
+$(function(){
+$("#ListPrefix").change(function(){
+GetUserSearch();
+	
+			});
+		}); 
+			
+			});
+function renderTable(result) {
+                var dtData = [];
+                $.each(result, function () {
+                    dtData.push([
+                        "<h2>"+this.FirstName+this.LastName+ "</h2>",
+						 "<img alt='ProfileImage' height='100' width='100' src="+this.Picture+" />",
+						 "<p><span>City:</span> "+this.City+"</p>",
+                         "<p><span>State:</span>"+this.State+"</p>",
+                         "<p><span>Country:</span>"+this.Country+"</p>",  
+                         "<p><span>Primary Language:</span>"+this.Language+"</p>",
+						 "<a href=UserProfile.html?Id="+this.UserName+">View Member Profile</a>", 
+						 "<a href=ContactConfirmed.html?Id="+this.UserName+">Add Member to Contacts</a>",
+						 "<a href=Invite.html?Type=Team&uti="+this.UserName+">Invite Member to Join a Team</a>", 
+						 "<a href=Invite.html?Type=Team&uti="+this.UserName+">Invite Member to Join a Fan Club</a>",
+						 "<a href=CreateFanClub.html?about="+this.UserName+">Create Fan Club About Member</a>"
+
+                        ]);
+					});
+
+		  $('#SearchResult').dataTable({ //SearchResult is the id of the table
+			  'aaData': dtData,
+			  'bDestroy':true
+		 });
+		 
+	
+	  }
+	  
+/// GetUserSearch() ///			
+function GetUserSearch(){ 
+var PrefixValue,FirstName,LastName,MiddleName,MaidenName,AlternateName,UserName;	
+if($("#ListPrefix").val()!='0')
+{
+PrefixValue = $("#ListPrefix").val();
+}
+else{PrefixValue= null}
+if($("#txtFirstName").val()==null||$("#txtFirstName").val()=='')
+{
+FirstName=null;}
+else{FirstName=$("#txtFirstName").val();}
+if($("#txtLastName").val()==null||$("#txtLastName").val()=='')
+{
+LastName=null;	
+}
+else{LastName=$("#txtLastName").val();}
+if($("#txtMiddleName").val()==null||$("#txtMiddleName").val()=='')
+{
+MiddleName=null;	
+}
+else{MiddleName=$("#txtMiddleName").val();}
+if($("#txtUserName").val()==null||$("#txtUserName").val()=='')
+{
+UserName=null;	
+}
+else{UserName=$("#txtUserName").val();}
+if($("#txtMaidenName").val()==null||$("#txtMaidenName").val()=='')
+{
+MaidenName=null;	
+}
+else{MaidenName=$("#txtMaidenName").val()}
+if($("#txtAlternateName").val()==null||$("#txtAlternateName").val()=='')
+{
+AlternateName=null;	
+}
+else{AlternateName=$("#txtAlternateName").val();}
+var ParamData={};
+
+ParamData={"prefix":PrefixValue,"FirstName":FirstName,"LastName":LastName,"UserName":UserName,"MaidenName":MaidenName,"AlternateName":AlternateName, "MiddleName":MiddleName};
+		
+	$.ajax({
+		url: 'http://2bvision.com/Kids2proSports/SearchService.asmx/GetUserSearch',
+		type: 'POST',
+		data:JSON.stringify(ParamData),
+		contentType: "application/json; charset=utf-8",
+		dataType: "json",
+		success: function (response) {
+			$("#SearchResult tbody").empty();			
+                renderTable(response.d);
+                },
+                failure: function (errMsg) {
+               alert(errMsg); //errorMessage is id of the div
+                }
+            });
+	}
+    </script>
+</head>
+<body onload="GetLeaderBoard(), GetRightAdver()">
+    <div id="wraper">
+        <header style="overflow: hidden;">
+            <div style="background: #800000; height: 57px;">
+                <div class="newmenubar">
+                    <a class="newmenucolor" id="myaccountimage" href="MyAccount.html" title="My Account" target="_self"></a>
+                    <a class="newmenucolor" id="messageimage"  href="Messages.html" title="Messages" target="_self"></a>
+                </div>
+            </div>
+            <select name="effects" id="effectTypes" style="display: none;">
+                <option value="drop">Drop</option>
+
+            </select>
+            <a href="#" id="button"></a>
+            <div class="toggler">
+                <div id="effect" class="ui-widget-content ui-corner-all" style="display: none;">
+                    <ul id="nav">
+                        <li><a href="userprofile.html" title="User Profile" target="_self">Profile</a> </li>
+                        <li><a href="SportsDefinitions.html" target="_self" title="Sports">Sports</a> </li>
+                        <li><a href="CreateArticle.html" title="CreateArticle" target="_self">Article</a> </li>
+                        <li><a href="CreateTeam.html" title="Teams" target="_self">Teams</a></li>
+                        <li><a href="CreateFanClub.html" title="Fanclubs" target="_self">Fanclubs</a></li>
+                        <li><a href="Logout.html" title="Logout" target="_self">Log Out</a></li>
+                    </ul>
+                </div>
+            </div>
+        </header>
+        <!-- inner menu starts-->
+        <!--<div class="innermenu">
+            <ul class="clearfix">
+                <li><a href="MyAccount.html" title="My Account" target="_self">My Account</a> </li>
+            </ul>
+        </div>-->
+        <!-- inner menu ends-->
+        <!-- header ends -->
+        <!-- container starts-->
+         <div id="divLeaderBoard">
+        </div>
+        <div class="contetns clearfix">
+            <!-- left area starts-->
+            <div class="contentLeft fLeft">
+                <div class="innerwrapper">
+                    <!-- contentLeft -->
+                    <div class="clear">
+                    </div>
+                    <br />
+                    <div class="clearfix">
+                        <div class="sportSubNav fLeft">
+                            <a href="AdvancedSearch.html"><span>Search by name</span></a>
+                        </div>
+                        <div class="sportSubNav fLeft">
+                            <a href="LanguageSearch.html"><span>Search by Location & Language</span> </a>
+                        </div>
+                        <!--  <div class="sportSubNav fLeft">
+                            <a href="CriteriaSearch.html"><span>Member Criteria Search</span> </a>
+                        </div>-->
+                        <div class="sportSubNav fLeft">
+                            <a href="ArticleSearch.html"><span>Article Search</span> </a>
+                        </div>
+                        <div class="sportSubNav fLeft">
+                            <a href="TeamSearch.html" title="#"><span>Team Search</span> </a>
+                        </div>
+                        <div class="sportSubNav fLeft">
+                            <a href="FanclubSearch.html" title="#"><span>Fan Club Search</span> </a>
+                        </div>
+                        <div class="sportSubNav fLeft">
+                            <a href="KeywordSearch.html" title="#"><span>Keyword Search</span> </a>
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <table id="HeaderTale" class="display">
+                    <thead>
+                        <tr>
+                            <th width="80px">
+                                Prefix
+                            </th>
+                        </tr>
+                        <tr>
+                            <th width="80px">
+                                FirstName
+                            </th>
+                            <th width="80px">
+                                MiddleName
+                            </th>
+                            <th width="80px">
+                                LastName
+                            </th>
+                            <th width="80px">
+                                UserName
+                            </th>
+                            <th width="80px">
+                                MaidenName
+                            </th>
+                            <th width="80px">
+                                AlternateName
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td width="80px">
+                                <select name="ListPrefix" style="width: 80px;" id="ListPrefix">
+                                    <option selected="true" value="0"></option>
+                                    <option value="Dr">Dr</option>
+                                    <option value="Mr">Mr</option>
+                                    <option value="Ms">Ms</option>
+                                    <option value="Mrs">Mrs</option>
+                                    <option value="Prof">Prof</option>
+                                </select>
+                            </td>
+                            <td width="80px">
+                                <input type="text" style="width: 80px;" id="txtFirstName" name="txtFirstName" onchange="GetUserSearch()" />
+                            </td>
+                            <td width="80px">
+                                <input type="text" style="width: 80px;" id="txtMiddleName" name="txtMiddleName" onchange="GetUserSearch()" />
+                            </td>
+                            <td width="80px">
+                                <input type="text" style="width: 80px;" id="txtLastName" name="txtLastName" onchange="GetUserSearch()" />
+                            </td>
+                            <td width="80px">
+                                <input type="text" style="width: 80px;" id="txtUserName" name="txtUserName" onchange="GetUserSearch()" />
+                            </td>
+                            <td width="80px">
+                                <input type="text" style="width: 80px;" id="txtMaidenName" name="txtMaidenName" onchange="GetUserSearch()" />
+                            </td>
+                            <!--<td width="80px">
+                                <input type="text" style="width: 80px;" id="txtAlternateName" name="txtAlternateName"
+                                    onchange="GetUserSearch()" />
+                            </td>-->
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="clear">
+                </div>
+                <div>
+                    <table id="SearchResult" class="dataTables_filter">
+                        <thead>
+                            <tr>
+                                <th>
+                                </th>
+                                <th>
+                                </th>
+                                <th>
+                                </th>
+                                <th>
+                                </th>
+                                <th>
+                                </th>
+                                <th>
+                                </th>
+                                <th>
+                                </th>
+                                <th>
+                                </th>
+                                <th>
+                                </th>
+                                <th>
+                                </th>
+                                <th>
+                                </th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <div id="errorMessage">
+                </div>
+            </div>
+            <!-- left area ends-->
+        </div>
+        <!-- container ends-->
+    </div>
+</body>
+</html>
